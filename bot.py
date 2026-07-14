@@ -1,14 +1,14 @@
 import os
 
-from telegram.ext import (
-    Application,
-    CommandHandler,
-    CallbackQueryHandler,
-    ContextTypes,
+from telegram import (
+    Update,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
 )
 from telegram.ext import (
     Application,
     CommandHandler,
+    CallbackQueryHandler,
     ContextTypes,
 )
 
@@ -22,14 +22,47 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [
+            InlineKeyboardButton("7", callback_data="7"),
+            InlineKeyboardButton("8", callback_data="8"),
+            InlineKeyboardButton("9", callback_data="9"),
+            InlineKeyboardButton("÷", callback_data="/"),
+        ],
+        [
+            InlineKeyboardButton("4", callback_data="4"),
+            InlineKeyboardButton("5", callback_data="5"),
+            InlineKeyboardButton("6", callback_data="6"),
+            InlineKeyboardButton("×", callback_data="*"),
+        ],
+        [
+            InlineKeyboardButton("1", callback_data="1"),
+            InlineKeyboardButton("2", callback_data="2"),
+            InlineKeyboardButton("3", callback_data="3"),
+            InlineKeyboardButton("−", callback_data="-"),
+        ],
+        [
+            InlineKeyboardButton("C", callback_data="clear"),
+            InlineKeyboardButton("0", callback_data="0"),
+            InlineKeyboardButton("=", callback_data="equals"),
+            InlineKeyboardButton("+", callback_data="+"),
+        ],
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text(
+        "🧮 Calculator\n\n0",
+        reply_markup=reply_markup,
+    )
+
+
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
     query = update.callback_query
-
     await query.answer()
 
     text = query.message.text
-
     display = text.split("\n\n")[1]
 
     data = query.data
@@ -38,10 +71,14 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         display = "0"
 
     elif data == "equals":
-        pass
+        try:
+            expression = display.replace("×", "*").replace("÷", "/")
+            result = eval(expression)
+            display = str(result)
+        except Exception:
+            display = "Error"
 
     else:
-
         if display == "0":
             display = data
         else:
@@ -76,11 +113,11 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await query.edit_message_text(
         text=f"🧮 Calculator\n\n{display}",
-        reply_markup=InlineKeyboardMarkup(keyboard)
+        reply_markup=InlineKeyboardMarkup(keyboard),
     )
 
-def main():
 
+def main():
     if BOT_TOKEN is None:
         print("BOT_TOKEN not found!")
         return
@@ -88,10 +125,10 @@ def main():
     app = Application.builder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("calc", calc))
-app.add_handler(CallbackQueryHandler(button))
+    app.add_handler(CommandHandler("calc", calc))
+    app.add_handler(CallbackQueryHandler(button))
 
-    print("Calculator Bot is running...")
+    print("✅ Calculator Bot is running...")
 
     app.run_polling()
 
