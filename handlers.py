@@ -25,16 +25,16 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     display = query.message.text.split("\n\n")[1]
     data = query.data
 
-   if data == "clear":
-    display = "0"
-
-elif data == "back":
-    if len(display) > 1:
-        display = display[:-1]
-    else:
+    if data == "clear":
         display = "0"
 
-elif data == "equals":
+    elif data == "back":
+        if len(display) > 1:
+            display = display[:-1]
+        else:
+            display = "0"
+
+    elif data == "equals":
         try:
             display = solve(display)
         except Exception:
