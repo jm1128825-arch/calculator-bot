@@ -1,9 +1,10 @@
 import os
 
-from telegram import (
-    Update,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    CallbackQueryHandler,
+    ContextTypes,
 )
 from telegram.ext import (
     Application,
@@ -21,7 +22,30 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    query = update.callback_query
+
+    await query.answer()
+
+    text = query.message.text
+
+    display = text.split("\n\n")[1]
+
+    data = query.data
+
+    if data == "clear":
+        display = "0"
+
+    elif data == "equals":
+        pass
+
+    else:
+
+        if display == "0":
+            display = data
+        else:
+            display += data
 
     keyboard = [
         [
@@ -50,14 +74,10 @@ async def calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ],
     ]
 
-    reply_markup = InlineKeyboardMarkup(keyboard)
-
-    await update.message.reply_text(
-        "🧮 Calculator\n\n"
-        "0",
-        reply_markup=reply_markup,
+    await query.edit_message_text(
+        text=f"🧮 Calculator\n\n{display}",
+        reply_markup=InlineKeyboardMarkup(keyboard)
     )
-
 
 def main():
 
@@ -68,7 +88,8 @@ def main():
     app = Application.builder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("calc", calc))
+app.add_handler(CommandHandler("calc", calc))
+app.add_handler(CallbackQueryHandler(button))
 
     print("Calculator Bot is running...")
 
