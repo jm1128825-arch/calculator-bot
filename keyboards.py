@@ -22,10 +22,15 @@ def calculator_keyboard():
             InlineKeyboardButton("−", callback_data="-"),
         ],
         [
-            InlineKeyboardButton("C", callback_data="clear"),
+            InlineKeyboardButton(".", callback_data="."),
             InlineKeyboardButton("0", callback_data="0"),
-            InlineKeyboardButton("=", callback_data="equals"),
+            InlineKeyboardButton("%", callback_data="%"),
             InlineKeyboardButton("+", callback_data="+"),
+        ],
+        [
+            InlineKeyboardButton("⌫", callback_data="back"),
+            InlineKeyboardButton("C", callback_data="clear"),
+            InlineKeyboardButton("=", callback_data="equals"),
         ],
     ]
 
